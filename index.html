@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="hu">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,22 +10,78 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        .draggable { touch-action: none; user-select: none; }
-        .window-header { cursor: move; }
-        .desktop-icon { transition: all 0.2s ease; }
-        .desktop-icon:hover { background-color: rgba(255, 255, 255, 0.1); border-radius: 0.5rem; }
-        .terminal-output { height: 250px; overflow-y: auto; }
-        .terminal-output::-webkit-scrollbar, .gui-list::-webkit-scrollbar { width: 6px; }
-        .terminal-output::-webkit-scrollbar-thumb, .gui-list::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-        .window-base { transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease; }
-        .is-dragging, .is-resizing { transition: none !important; }
-        
-        .maximized { top: 0 !important; left: 0 !important; width: 100% !important; height: calc(100% - 4rem) !important; transform: none !important; border-radius: 0 !important; }
-        .iframe-shield { display: none; position: absolute; inset: 0; z-index: 50; }
-        .is-dragging .iframe-shield, .is-resizing .iframe-shield { display: block; }
-        
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .draggable {
+            touch-action: none;
+            user-select: none;
+        }
+
+        .window-header {
+            cursor: move;
+        }
+
+        .desktop-icon {
+            transition: all 0.2s ease;
+        }
+
+        .desktop-icon:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+        }
+
+        .terminal-output {
+            height: 250px;
+            overflow-y: auto;
+        }
+
+        .terminal-output::-webkit-scrollbar,
+        .gui-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .terminal-output::-webkit-scrollbar-thumb,
+        .gui-list::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+
+        .window-base {
+            transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease;
+        }
+
+        .is-dragging,
+        .is-resizing {
+            transition: none !important;
+        }
+
+        .maximized {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: calc(100% - 4rem) !important;
+            transform: none !important;
+            border-radius: 0 !important;
+        }
+
+        .iframe-shield {
+            display: none;
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+        }
+
+        .is-dragging .iframe-shield,
+        .is-resizing .iframe-shield {
+            display: block;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
         /* MOBIL OPTIMALIZÁLÁS KÉNYSZERÍTÉSE */
         @media (max-width: 768px) {
@@ -33,14 +90,27 @@
                 left: 0 !important;
                 width: 100% !important;
                 height: calc(100vh - 4rem) !important;
-                transform: none !important; 
+                transform: none !important;
                 border-radius: 0 !important;
             }
-            .desktop-icon { width: 70px; padding: 4px; }
-            .desktop-icon i { font-size: 2.2rem; margin-bottom: 4px; }
-            .desktop-icon span { font-size: 0.65rem; }
-            
-            .btn-maximize { display: none; }
+
+            .desktop-icon {
+                width: 70px;
+                padding: 4px;
+            }
+
+            .desktop-icon i {
+                font-size: 2.2rem;
+                margin-bottom: 4px;
+            }
+
+            .desktop-icon span {
+                font-size: 0.65rem;
+            }
+
+            .btn-maximize {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -48,57 +118,89 @@
 <body class="bg-gray-900 h-screen w-screen overflow-hidden flex flex-col relative font-sans text-gray-200">
 
     <!-- BEJELENTKEZŐ KÉPERNYŐ -->
-    <div id="login-screen" class="absolute inset-0 bg-gray-900 z-[100] flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')] bg-cover bg-center before:content-[''] before:absolute before:inset-0 before:bg-black/70 backdrop-blur-sm transition-opacity duration-500 px-4">
-        <div class="relative z-10 bg-gray-800/90 p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-md text-center border border-gray-700">
-            <i class="fa-solid fa-server text-5xl sm:text-6xl text-blue-500 mb-4 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"></i>
+    <div id="login-screen"
+        class="absolute inset-0 bg-gray-900 z-[100] flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')] bg-cover bg-center before:content-[''] before:absolute before:inset-0 before:bg-black/70 backdrop-blur-sm transition-opacity duration-500 px-4">
+        <div
+            class="relative z-10 bg-gray-800/90 p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-md text-center border border-gray-700">
+            <i
+                class="fa-solid fa-server text-5xl sm:text-6xl text-blue-500 mb-4 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]"></i>
             <h2 class="text-xl sm:text-2xl font-bold text-white mb-2">Mixademy OS</h2>
             <p id="login-msg" class="text-gray-400 text-sm mb-6">Azonosítás a Workspace hálózaton</p>
 
             <div class="text-left mb-2">
                 <label class="text-xs text-gray-400 font-bold uppercase">Szervezet (Workspace ID)</label>
             </div>
-            <input type="text" id="login-workspace" placeholder="pl. mixademy" class="w-full bg-gray-900 text-white px-4 py-3 rounded-lg mb-4 border border-blue-500/50 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-            <input type="text" id="login-username" placeholder="Felhasználónév" class="w-full bg-gray-900 text-white px-4 py-3 rounded-lg mb-4 border border-gray-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
-            <input type="password" id="login-password" placeholder="Jelszó" class="w-full bg-gray-900 text-white px-4 py-3 rounded-lg mb-6 border border-gray-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition" onkeydown="if(event.key === 'Enter') window.performLogin()">
-            <button onclick="window.performLogin()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg hover:shadow-blue-500/30">Belépés a rendszerbe</button>
+            <input type="text" id="login-workspace" placeholder="pl. mixademy"
+                class="w-full bg-gray-900 text-white px-4 py-3 rounded-lg mb-4 border border-blue-500/50 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+            <input type="text" id="login-username" placeholder="Felhasználónév"
+                class="w-full bg-gray-900 text-white px-4 py-3 rounded-lg mb-4 border border-gray-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+            <input type="password" id="login-password" placeholder="Jelszó"
+                class="w-full bg-gray-900 text-white px-4 py-3 rounded-lg mb-6 border border-gray-600 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                onkeydown="if(event.key === 'Enter') window.performLogin()">
+            <button onclick="window.performLogin()"
+                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg hover:shadow-blue-500/30">Belépés
+                a rendszerbe</button>
         </div>
     </div>
 
     <!-- ASZTAL ÉS IKONOK -->
-    <div id="desktop" class="relative w-full flex-grow bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')] bg-cover bg-center z-0 before:content-[''] before:absolute before:inset-0 before:bg-gray-900/80">
+    <div id="desktop"
+        class="relative w-full flex-grow bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')] bg-cover bg-center z-0 before:content-[''] before:absolute before:inset-0 before:bg-gray-900/80">
 
         <!-- Kijelentkezés Gomb a sarokban -->
-        <button onclick="window.systemLogout()" class="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-red-500 flex flex-col items-center transition transform hover:scale-110 z-10">
+        <button onclick="window.systemLogout()"
+            class="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-red-500 flex flex-col items-center transition transform hover:scale-110 z-10">
             <i class="fa-solid fa-power-off text-2xl sm:text-3xl mb-1"></i>
             <span class="text-[10px] sm:text-xs font-bold shadow-black drop-shadow-md">Kilépés</span>
         </button>
 
-        <div class="absolute top-4 left-4 sm:top-6 sm:left-6 flex flex-wrap gap-4 sm:gap-6 z-0 max-w-[200px] sm:max-w-none flex-col">
+        <div
+            class="absolute top-4 left-4 sm:top-6 sm:left-6 flex flex-wrap gap-4 sm:gap-6 z-0 max-w-[200px] sm:max-w-none flex-col">
             <!-- ALAP ALKALMAZÁSOK -->
-            <div onclick="window.openWindow('window-drive')" class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
-                <i class="fa-solid fa-cloud text-blue-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
+            <div onclick="window.openWindow('window-drive')"
+                class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
+                <i
+                    class="fa-solid fa-cloud text-blue-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
                 <span class="text-white text-xs text-center font-medium drop-shadow-md">Drive</span>
             </div>
-            <div onclick="window.openWindow('window-event')" class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
-                <i class="fa-solid fa-calendar-check text-purple-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
+            <div onclick="window.openWindow('window-event')"
+                class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
+                <i
+                    class="fa-solid fa-calendar-check text-purple-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
                 <span class="text-white text-xs text-center font-medium drop-shadow-md">Event</span>
             </div>
-            <div onclick="window.openWindow('window-web')" class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
-                <i class="fa-solid fa-globe text-yellow-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
+            <div onclick="window.openWindow('window-web')"
+                class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
+                <i
+                    class="fa-solid fa-globe text-yellow-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
                 <span class="text-white text-xs text-center font-medium drop-shadow-md">Web</span>
             </div>
-            <div onclick="window.openWindow('window-terminal')" class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
-                <i class="fa-solid fa-terminal text-green-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
+            <!-- ÚJ: ORION AI -->
+            <div onclick="window.openWindow('window-orion')"
+                class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
+                <i
+                    class="fa-solid fa-robot text-cyan-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
+                <span class="text-white text-xs text-center font-medium drop-shadow-md">Orion AI</span>
+            </div>
+
+            <div onclick="window.openWindow('window-terminal')"
+                class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
+                <i
+                    class="fa-solid fa-terminal text-green-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
                 <span class="text-white text-xs text-center font-medium drop-shadow-md">Terminal</span>
             </div>
 
             <!-- ADMIN ALKALMAZÁSOK -->
-            <div id="icon-users" onclick="window.openWindow('window-users')" class="desktop-icon super-ui hidden flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
-                <i class="fa-solid fa-users text-orange-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
+            <div id="icon-users" onclick="window.openWindow('window-users')"
+                class="desktop-icon super-ui hidden flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
+                <i
+                    class="fa-solid fa-users text-orange-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
                 <span class="text-white text-xs text-center font-medium drop-shadow-md">Userek</span>
             </div>
-            <div id="icon-domains" onclick="window.openWindow('window-domains')" class="desktop-icon master-ui hidden flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
-                <i class="fa-solid fa-network-wired text-red-500 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
+            <div id="icon-domains" onclick="window.openWindow('window-domains')"
+                class="desktop-icon master-ui hidden flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
+                <i
+                    class="fa-solid fa-network-wired text-red-500 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
                 <span class="text-white text-xs text-center font-medium drop-shadow-md">Domain</span>
             </div>
         </div>
@@ -106,12 +208,19 @@
         <!-- =================== ABLAKOK =================== -->
 
         <!-- DRIVE -->
-        <div id="window-drive" class="draggable window-base absolute top-10 left-10 md:left-32 w-full md:w-[900px] h-full md:h-[600px] bg-gray-800 border border-gray-600 rounded-lg shadow-2xl hidden flex-col" style="z-index: 10;">
-            <div class="window-header bg-gray-700 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
+        <div id="window-drive"
+            class="draggable window-base absolute top-10 left-10 md:left-32 w-full md:w-[900px] h-full md:h-[600px] bg-gray-800 border border-gray-600 rounded-lg shadow-2xl hidden flex-col"
+            style="z-index: 10;">
+            <div
+                class="window-header bg-gray-700 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
                 <span><i class="fa-solid fa-cloud mr-2 text-blue-400"></i>Mixademy Drive</span>
                 <div>
-                    <button onclick="window.toggleMaximize('window-drive')" class="btn-maximize text-gray-400 hover:text-white transition px-2"><i class="fa-solid fa-expand"></i></button>
-                    <button onclick="window.closeWindow('window-drive')" class="text-gray-400 hover:text-red-500 transition px-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <button onclick="window.toggleMaximize('window-drive')"
+                        class="btn-maximize text-gray-400 hover:text-white transition px-2"><i
+                            class="fa-solid fa-expand"></i></button>
+                    <button onclick="window.closeWindow('window-drive')"
+                        class="text-gray-400 hover:text-red-500 transition px-2"><i
+                            class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
             <div class="flex-grow bg-white md:rounded-b-lg overflow-hidden relative">
@@ -121,12 +230,19 @@
         </div>
 
         <!-- EVENT MANAGER -->
-        <div id="window-event" class="draggable window-base absolute top-16 left-12 md:left-40 w-full md:w-[900px] h-full md:h-[600px] bg-gray-800 border border-purple-900 rounded-lg shadow-2xl hidden flex-col" style="z-index: 10;">
-            <div class="window-header bg-purple-900 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
+        <div id="window-event"
+            class="draggable window-base absolute top-16 left-12 md:left-40 w-full md:w-[900px] h-full md:h-[600px] bg-gray-800 border border-purple-900 rounded-lg shadow-2xl hidden flex-col"
+            style="z-index: 10;">
+            <div
+                class="window-header bg-purple-900 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
                 <span><i class="fa-solid fa-calendar-check mr-2 text-purple-300"></i>Event Manager</span>
                 <div>
-                    <button onclick="window.toggleMaximize('window-event')" class="btn-maximize text-purple-300 hover:text-white transition px-2"><i class="fa-solid fa-expand"></i></button>
-                    <button onclick="window.closeWindow('window-event')" class="text-purple-300 hover:text-white transition px-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <button onclick="window.toggleMaximize('window-event')"
+                        class="btn-maximize text-purple-300 hover:text-white transition px-2"><i
+                            class="fa-solid fa-expand"></i></button>
+                    <button onclick="window.closeWindow('window-event')"
+                        class="text-purple-300 hover:text-white transition px-2"><i
+                            class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
             <div class="flex-grow bg-white md:rounded-b-lg overflow-hidden relative">
@@ -136,12 +252,19 @@
         </div>
 
         <!-- MIXADEMY WEB -->
-        <div id="window-web" class="draggable window-base absolute top-24 left-14 md:left-48 w-full md:w-[1000px] h-full md:h-[650px] bg-white border border-gray-400 rounded-lg shadow-2xl hidden flex-col" style="z-index: 10;">
-            <div class="window-header bg-gray-200 p-3 flex justify-between items-center md:rounded-t-lg text-gray-800 font-bold text-sm border-b border-gray-300">
+        <div id="window-web"
+            class="draggable window-base absolute top-24 left-14 md:left-48 w-full md:w-[1000px] h-full md:h-[650px] bg-white border border-gray-400 rounded-lg shadow-2xl hidden flex-col"
+            style="z-index: 10;">
+            <div
+                class="window-header bg-gray-200 p-3 flex justify-between items-center md:rounded-t-lg text-gray-800 font-bold text-sm border-b border-gray-300">
                 <span><i class="fa-solid fa-globe mr-2 text-blue-600"></i>Mixademy.hu</span>
                 <div>
-                    <button onclick="window.toggleMaximize('window-web')" class="btn-maximize text-gray-500 hover:text-black transition px-2"><i class="fa-solid fa-expand"></i></button>
-                    <button onclick="window.closeWindow('window-web')" class="text-gray-500 hover:text-red-500 transition px-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <button onclick="window.toggleMaximize('window-web')"
+                        class="btn-maximize text-gray-500 hover:text-black transition px-2"><i
+                            class="fa-solid fa-expand"></i></button>
+                    <button onclick="window.closeWindow('window-web')"
+                        class="text-gray-500 hover:text-red-500 transition px-2"><i
+                            class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
             <div class="flex-grow bg-white md:rounded-b-lg overflow-hidden relative">
@@ -150,13 +273,43 @@
             </div>
         </div>
 
-        <!-- TERMINÁL -->
-        <div id="window-terminal" class="draggable window-base absolute top-10 md:right-20 w-full md:w-[650px] bg-black border border-gray-700 rounded-lg shadow-2xl hidden flex-col" style="z-index: 10;">
-            <div class="window-header bg-gray-800 p-3 flex justify-between items-center md:rounded-t-lg text-green-400 font-mono text-sm">
-                <span><i class="fa-solid fa-terminal mr-2"></i>Terminal <span id="role-badge" class="ml-2 px-2 py-0.5 bg-gray-700 rounded text-xs"></span></span>
+        <!-- ÚJ: ORION AI ABLAK -->
+        <div id="window-orion"
+            class="draggable window-base absolute top-28 left-20 md:left-56 w-full md:w-[900px] h-full md:h-[650px] bg-gray-900 border border-cyan-700 rounded-lg shadow-2xl hidden flex-col"
+            style="z-index: 10;">
+            <div
+                class="window-header bg-cyan-900 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
+                <span><i class="fa-solid fa-robot mr-2 text-cyan-300"></i>Orion AI</span>
                 <div>
-                    <button onclick="window.toggleMaximize('window-terminal')" class="btn-maximize text-gray-400 hover:text-white transition px-2"><i class="fa-solid fa-expand"></i></button>
-                    <button onclick="window.closeWindow('window-terminal')" class="text-gray-400 hover:text-red-500 transition px-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <button onclick="window.toggleMaximize('window-orion')"
+                        class="btn-maximize text-cyan-300 hover:text-white transition px-2"><i
+                            class="fa-solid fa-expand"></i></button>
+                    <button onclick="window.closeWindow('window-orion')"
+                        class="text-cyan-300 hover:text-white transition px-2"><i
+                            class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+            </div>
+            <div class="flex-grow bg-white md:rounded-b-lg overflow-hidden relative">
+                <div class="iframe-shield bg-transparent"></div>
+                <iframe id="iframe-orion" src="" class="w-full h-full border-none"></iframe>
+            </div>
+        </div>
+
+        <!-- TERMINÁL -->
+        <div id="window-terminal"
+            class="draggable window-base absolute top-10 md:right-20 w-full md:w-[650px] bg-black border border-gray-700 rounded-lg shadow-2xl hidden flex-col"
+            style="z-index: 10;">
+            <div
+                class="window-header bg-gray-800 p-3 flex justify-between items-center md:rounded-t-lg text-green-400 font-mono text-sm">
+                <span><i class="fa-solid fa-terminal mr-2"></i>Terminal <span id="role-badge"
+                        class="ml-2 px-2 py-0.5 bg-gray-700 rounded text-xs"></span></span>
+                <div>
+                    <button onclick="window.toggleMaximize('window-terminal')"
+                        class="btn-maximize text-gray-400 hover:text-white transition px-2"><i
+                            class="fa-solid fa-expand"></i></button>
+                    <button onclick="window.closeWindow('window-terminal')"
+                        class="text-gray-400 hover:text-red-500 transition px-2"><i
+                            class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
             <div class="p-4 text-green-400 font-mono text-sm flex flex-col flex-grow relative">
@@ -167,102 +320,155 @@
                 </div>
                 <div class="flex items-center mt-2 border-t border-gray-800 pt-2">
                     <span class="mr-2 text-green-500" id="term-prompt">user@ws:~#</span>
-                    <input type="text" id="term-input" class="bg-black text-green-400 outline-none flex-grow" autocomplete="off" onkeydown="window.handleTerminal(event)">
+                    <input type="text" id="term-input" class="bg-black text-green-400 outline-none flex-grow"
+                        autocomplete="off" onkeydown="window.handleTerminal(event)">
                 </div>
             </div>
         </div>
 
         <!-- FELHASZNÁLÓK ABLAK -->
-        <div id="window-users" class="draggable window-base absolute top-20 md:left-1/4 w-full md:w-[600px] h-full md:h-[550px] bg-gray-800 border border-orange-700 rounded-lg shadow-2xl hidden flex-col" style="z-index: 10;">
-            <div class="window-header bg-orange-900 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
-                <span><i class="fa-solid fa-users mr-2 text-orange-300"></i>Felhasználó Kezelő (<span id="gui-users-ws-title"></span>)</span>
+        <div id="window-users"
+            class="draggable window-base absolute top-20 md:left-1/4 w-full md:w-[600px] h-full md:h-[550px] bg-gray-800 border border-orange-700 rounded-lg shadow-2xl hidden flex-col"
+            style="z-index: 10;">
+            <div
+                class="window-header bg-orange-900 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
+                <span><i class="fa-solid fa-users mr-2 text-orange-300"></i>Felhasználó Kezelő (<span
+                        id="gui-users-ws-title"></span>)</span>
                 <div>
-                    <button onclick="window.toggleMaximize('window-users')" class="btn-maximize text-orange-300 hover:text-white transition px-2"><i class="fa-solid fa-expand"></i></button>
-                    <button onclick="window.closeWindow('window-users')" class="text-orange-300 hover:text-white transition px-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <button onclick="window.toggleMaximize('window-users')"
+                        class="btn-maximize text-orange-300 hover:text-white transition px-2"><i
+                            class="fa-solid fa-expand"></i></button>
+                    <button onclick="window.closeWindow('window-users')"
+                        class="text-orange-300 hover:text-white transition px-2"><i
+                            class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
             <div class="p-3 sm:p-4 flex-grow flex flex-col bg-gray-800 md:rounded-b-lg">
                 <div class="bg-gray-900 p-3 sm:p-4 rounded-lg border border-gray-700 mb-4 shadow-inner">
-                    <h3 class="text-orange-400 font-bold mb-3 text-sm uppercase"><i class="fa-solid fa-user-plus mr-2"></i>Új Fiók</h3>
+                    <h3 class="text-orange-400 font-bold mb-3 text-sm uppercase"><i
+                            class="fa-solid fa-user-plus mr-2"></i>Új Fiók</h3>
                     <div class="flex flex-col sm:flex-row gap-2 mb-2">
-                        <input type="text" id="gui-u-name" placeholder="Név" class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-orange-500">
-                        <input type="password" id="gui-u-pass" placeholder="Jelszó" class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-orange-500">
+                        <input type="text" id="gui-u-name" placeholder="Név"
+                            class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-orange-500">
+                        <input type="password" id="gui-u-pass" placeholder="Jelszó"
+                            class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-orange-500">
                     </div>
                     <div class="flex flex-col sm:flex-row gap-2">
-                        <select id="gui-u-role" class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-orange-500">
+                        <select id="gui-u-role"
+                            class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-orange-500">
                             <option value="Adminisztrátor">Adminisztrátor</option>
                             <option value="Szervező">Szervező</option>
                             <option value="Technikus">Technikus</option>
                             <option value="Superadmin">Szuperadmin</option>
                         </select>
-                        <button onclick="window.guiAddUser()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded transition w-full sm:w-1/3">Hozzáad</button>
+                        <button onclick="window.guiAddUser()"
+                            class="bg-orange-600 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded transition w-full sm:w-1/3">Hozzáad</button>
                     </div>
                 </div>
                 <h3 class="text-gray-400 text-xs font-bold uppercase mb-2">Aktív Felhasználók</h3>
-                <div id="gui-users-list" class="gui-list flex-grow overflow-y-auto bg-black rounded-lg border border-gray-700 p-2"></div>
+                <div id="gui-users-list"
+                    class="gui-list flex-grow overflow-y-auto bg-black rounded-lg border border-gray-700 p-2"></div>
             </div>
         </div>
 
         <!-- TARTOMÁNYOK ABLAK -->
-        <div id="window-domains" class="draggable window-base absolute top-16 md:right-1/4 w-full md:w-[750px] h-full md:h-[600px] bg-gray-800 border border-red-800 rounded-lg shadow-2xl hidden flex-col" style="z-index: 10;">
-            <div class="window-header bg-red-950 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
+        <div id="window-domains"
+            class="draggable window-base absolute top-16 md:right-1/4 w-full md:w-[750px] h-full md:h-[600px] bg-gray-800 border border-red-800 rounded-lg shadow-2xl hidden flex-col"
+            style="z-index: 10;">
+            <div
+                class="window-header bg-red-950 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm">
                 <span><i class="fa-solid fa-network-wired mr-2 text-red-400"></i>Tartomány Menedzser</span>
                 <div>
-                    <button onclick="window.toggleMaximize('window-domains')" class="btn-maximize text-red-400 hover:text-white transition px-2"><i class="fa-solid fa-expand"></i></button>
-                    <button onclick="window.closeWindow('window-domains')" class="text-red-400 hover:text-white transition px-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    <button onclick="window.toggleMaximize('window-domains')"
+                        class="btn-maximize text-red-400 hover:text-white transition px-2"><i
+                            class="fa-solid fa-expand"></i></button>
+                    <button onclick="window.closeWindow('window-domains')"
+                        class="text-red-400 hover:text-white transition px-2"><i
+                            class="fa-solid fa-xmark text-lg"></i></button>
                 </div>
             </div>
             <div class="p-3 sm:p-4 flex-grow flex flex-col bg-gray-800 md:rounded-b-lg">
                 <div class="bg-gray-900 p-3 sm:p-4 rounded-lg border border-red-900 mb-4 shadow-inner">
-                    <h3 class="text-red-400 font-bold mb-3 text-sm uppercase"><i class="fa-solid fa-plus-square mr-2"></i>Új Workspace Rögzítése</h3>
+                    <h3 class="text-red-400 font-bold mb-3 text-sm uppercase"><i
+                            class="fa-solid fa-plus-square mr-2"></i>Új Workspace Rögzítése</h3>
                     <div class="flex gap-2 mb-2">
-                        <input type="text" id="gui-d-id" placeholder="Workspace ID" class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
+                        <input type="text" id="gui-d-id" placeholder="Workspace ID"
+                            class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
                     </div>
                     <div class="flex flex-col sm:flex-row gap-2 mb-2">
-                        <input type="text" id="gui-d-admin" placeholder="Admin Név" class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
-                        <input type="password" id="gui-d-pass" placeholder="Jelszó" class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
+                        <input type="text" id="gui-d-admin" placeholder="Admin Név"
+                            class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
+                        <input type="password" id="gui-d-pass" placeholder="Jelszó"
+                            class="flex-1 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
                     </div>
                     <div class="flex gap-2 mb-4">
-                        <input type="number" id="gui-d-duration" placeholder="Idő" min="1" class="w-1/3 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
-                        <select id="gui-d-unit" class="w-2/3 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
-                            <option value="days">Nap</option><option value="months">Hónap</option><option value="years">Év</option>
+                        <input type="number" id="gui-d-duration" placeholder="Idő" min="1"
+                            class="w-1/3 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
+                        <select id="gui-d-unit"
+                            class="w-2/3 bg-black text-white px-3 py-2 rounded border border-gray-600 text-sm outline-none focus:border-red-500">
+                            <option value="days">Nap</option>
+                            <option value="months">Hónap</option>
+                            <option value="years">Év</option>
                         </select>
                     </div>
-                    <button onclick="window.guiAddDomain()" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition">Létrehozás</button>
+                    <button onclick="window.guiAddDomain()"
+                        class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition">Létrehozás</button>
                 </div>
                 <h3 class="text-gray-400 text-xs font-bold uppercase mb-2">Regisztrált Tartományok</h3>
-                <div id="gui-domains-list" class="gui-list flex-grow overflow-y-auto bg-black rounded-lg border border-gray-700 p-2"></div>
+                <div id="gui-domains-list"
+                    class="gui-list flex-grow overflow-y-auto bg-black rounded-lg border border-gray-700 p-2"></div>
             </div>
         </div>
 
     </div>
 
     <!-- TÁLCA -->
-    <div class="w-full h-16 bg-gray-950 border-t border-gray-800 flex items-center justify-start sm:justify-center px-4 space-x-2 sm:space-x-6 z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.5)] relative overflow-x-auto whitespace-nowrap scrollbar-hide">
-        <button onclick="window.openWindow('window-drive')" class="text-gray-400 hover:text-blue-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
-            <i class="fa-solid fa-cloud text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Drive</span>
+    <div
+        class="w-full h-16 bg-gray-950 border-t border-gray-800 flex items-center justify-start sm:justify-center px-4 space-x-2 sm:space-x-6 z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.5)] relative overflow-x-auto whitespace-nowrap scrollbar-hide">
+        <button onclick="window.openWindow('window-drive')"
+            class="text-gray-400 hover:text-blue-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-cloud text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Drive</span>
         </button>
-        <button onclick="window.openWindow('window-event')" class="text-gray-400 hover:text-purple-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
-            <i class="fa-solid fa-calendar-check text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Event</span>
+        <button onclick="window.openWindow('window-event')"
+            class="text-gray-400 hover:text-purple-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-calendar-check text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Event</span>
         </button>
-        <button onclick="window.openWindow('window-web')" class="text-gray-400 hover:text-yellow-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
-            <i class="fa-solid fa-globe text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Web</span>
+        <button onclick="window.openWindow('window-web')"
+            class="text-gray-400 hover:text-yellow-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-globe text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Web</span>
         </button>
-        <button onclick="window.openWindow('window-terminal')" class="text-gray-400 hover:text-green-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
-            <i class="fa-solid fa-terminal text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Term</span>
+        <!-- ÚJ: ORION AI IKON -->
+        <button onclick="window.openWindow('window-orion')"
+            class="text-gray-400 hover:text-cyan-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-robot text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Orion</span>
+        </button>
+        <button onclick="window.openWindow('window-terminal')"
+            class="text-gray-400 hover:text-green-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-terminal text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Term</span>
         </button>
 
         <div class="super-ui hidden w-px h-8 bg-gray-700 mx-1 flex-shrink-0"></div>
-        <button id="dock-users" onclick="window.openWindow('window-users')" class="super-ui hidden text-gray-400 hover:text-orange-400 flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
-            <i class="fa-solid fa-users text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Users</span>
+        <button id="dock-users" onclick="window.openWindow('window-users')"
+            class="super-ui hidden text-gray-400 hover:text-orange-400 flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-users text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Users</span>
         </button>
-        <button id="dock-domains" onclick="window.openWindow('window-domains')" class="master-ui hidden text-gray-400 hover:text-red-500 flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
-            <i class="fa-solid fa-network-wired text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Domain</span>
+        <button id="dock-domains" onclick="window.openWindow('window-domains')"
+            class="master-ui hidden text-gray-400 hover:text-red-500 flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-network-wired text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Domain</span>
         </button>
 
         <div class="w-px h-8 bg-gray-700 mx-1 flex-shrink-0"></div>
-        <button onclick="window.systemLogout()" class="text-gray-400 hover:text-red-500 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
-            <i class="fa-solid fa-power-off text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Logout</span>
+        <button onclick="window.systemLogout()"
+            class="text-gray-400 hover:text-red-500 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-power-off text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Logout</span>
         </button>
 
         <!-- ÓRA ÉS DÁTUM A TÁLCÁN -->
@@ -367,6 +573,7 @@
             document.getElementById('iframe-drive').src = `https://drive.mixademy.hu/?session_token=${tokenStr}`;
             document.getElementById('iframe-event').src = `https://event.mixademy.hu/?session_token=${tokenStr}`;
             document.getElementById('iframe-web').src = `https://mixademy.hu/?session_token=${tokenStr}`;
+            document.getElementById('iframe-orion').src = `https://orionai.mixademy.hu/?session_token=${tokenStr}`; // ORION AI
 
             if (appState.isSuperAdmin) {
                 document.getElementById('gui-users-ws-title').innerText = appState.currentWorkspaceId.toUpperCase();
@@ -380,15 +587,15 @@
         }
 
         window.systemLogout = function () {
-            // MEGERŐSÍTÉS HOZZÁADVA
             if (!confirm("Biztosan ki szeretnél jelentkezni?")) return;
 
             appState = { currentWorkspaceId: null, currentUser: null, isSuperAdmin: false, workspaceUsers: [], globalTenants: [] };
             document.querySelectorAll('.draggable').forEach(w => window.closeWindow(w.id));
-            
+
             document.getElementById('iframe-drive').src = '';
             document.getElementById('iframe-event').src = '';
             document.getElementById('iframe-web').src = '';
+            document.getElementById('iframe-orion').src = ''; // ORION AI
 
             document.querySelectorAll('.master-ui, .super-ui').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
 
@@ -418,9 +625,9 @@
                         <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded ml-2 font-bold ${badgeClass}">${u.role}</span>
                     </div>
                     ${u.username !== appState.currentUser.username ?
-                    `<button onclick="window.guiRmUser('${u.username}')" class="text-red-500 hover:text-white hover:bg-red-600 bg-black px-2 sm:px-3 py-1 rounded text-xs border border-red-900 transition shadow">Törlés</button>` :
-                    '<span class="text-[10px] sm:text-xs text-gray-600 px-2 sm:px-3 py-1 bg-black border border-gray-800 rounded">Te vagy</span>'
-                }
+                        `<button onclick="window.guiRmUser('${u.username}')" class="text-red-500 hover:text-white hover:bg-red-600 bg-black px-2 sm:px-3 py-1 rounded text-xs border border-red-900 transition shadow">Törlés</button>` :
+                        '<span class="text-[10px] sm:text-xs text-gray-600 px-2 sm:px-3 py-1 bg-black border border-gray-800 rounded">Te vagy</span>'
+                    }
                 </div>
             `}).join('');
         };
@@ -460,7 +667,7 @@
                 let statusBadge = '<span class="px-2 py-0.5 rounded text-[9px] sm:text-[10px] uppercase font-bold bg-green-900 text-green-300">Aktív</span>';
                 let isExpired = false;
                 let dateStr = t.expiresAt === 'Soha (Master)' ? 'Végtelen' : new Date(t.expiresAt).toLocaleDateString('hu-HU');
-                
+
                 if (t.expiresAt !== 'Soha (Master)' && Date.now() > t.expiresAt) {
                     statusBadge = '<span class="px-2 py-0.5 rounded text-[9px] sm:text-[10px] uppercase font-bold bg-red-900 text-red-300">Lejárt</span>'; isExpired = true;
                 }
@@ -475,9 +682,9 @@
                         <div class="text-[10px] sm:text-xs text-gray-400 truncate">Admin: <span class="text-gray-200 font-medium">${t.adminUser}</span> | Lejárat: <span class="text-gray-200">${dateStr}</span></div>
                     </div>
                     ${t.id !== MASTER_WORKSPACE_ID ?
-                    `<button onclick="window.guiRmDomain('${t.id}')" class="text-red-500 hover:text-white hover:bg-red-600 bg-black px-2 sm:px-3 py-1 rounded text-xs border border-red-900 transition shadow ml-2">Törlés</button>` :
-                    '<span class="text-[10px] sm:text-xs text-gray-600 bg-black border border-gray-800 px-2 sm:px-3 py-1 rounded ml-2">Védett</span>'
-                }
+                        `<button onclick="window.guiRmDomain('${t.id}')" class="text-red-500 hover:text-white hover:bg-red-600 bg-black px-2 sm:px-3 py-1 rounded text-xs border border-red-900 transition shadow ml-2">Törlés</button>` :
+                        '<span class="text-[10px] sm:text-xs text-gray-600 bg-black border border-gray-800 px-2 sm:px-3 py-1 rounded ml-2">Védett</span>'
+                    }
                 </div>
             `}).join('');
         };
@@ -504,7 +711,7 @@
 
             document.getElementById('gui-d-id').value = ''; document.getElementById('gui-d-admin').value = '';
             document.getElementById('gui-d-pass').value = ''; document.getElementById('gui-d-duration').value = '';
-            
+
             window.guiRenderDomains();
             alert(`Workspace sikeresen kiadva! Lejárat: ${new Date(expiresAt).toLocaleDateString('hu-HU')}`);
         };
@@ -519,18 +726,18 @@
 
         // Ablakkezelés 
         window.toggleMaximize = function (id) { const win = document.getElementById(id); win.classList.toggle('maximized'); window.bringToFront(win); };
-        window.openWindow = function (id) { 
-            const win = document.getElementById(id); 
-            if (win.classList.contains('hidden')) { win.classList.remove('hidden'); win.classList.add('flex'); } 
-            window.bringToFront(win); 
-            if (id === 'window-terminal') setTimeout(() => document.getElementById('term-input').focus(), 50); 
+        window.openWindow = function (id) {
+            const win = document.getElementById(id);
+            if (win.classList.contains('hidden')) { win.classList.remove('hidden'); win.classList.add('flex'); }
+            window.bringToFront(win);
+            if (id === 'window-terminal') setTimeout(() => document.getElementById('term-input').focus(), 50);
         };
         window.closeWindow = function (id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); };
         window.bringToFront = function (element) { zIndexCounter++; element.style.zIndex = zIndexCounter; };
 
-        document.querySelectorAll('.draggable').forEach(el => { el.addEventListener('mousedown', () => window.bringToFront(el)); el.addEventListener('touchstart', () => window.bringToFront(el), {passive: true}); });
+        document.querySelectorAll('.draggable').forEach(el => { el.addEventListener('mousedown', () => window.bringToFront(el)); el.addEventListener('touchstart', () => window.bringToFront(el), { passive: true }); });
 
-        // ABLAKOK HÚZÁSA ÉS ÚJ: ÁTMÉRETEZÉSE (RESIZABLE)
+        // ABLAKOK HÚZÁSA ÉS ÁTMÉRETEZÉSE
         interact('.draggable')
             .draggable({
                 allowFrom: '.window-header',
@@ -555,7 +762,7 @@
                     move(event) {
                         var target = event.target;
                         if (target.classList.contains('maximized') || window.innerWidth <= 768) return;
-                        
+
                         var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.deltaRect.left;
                         var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.deltaRect.top;
 
@@ -607,4 +814,5 @@
         }
     </script>
 </body>
+
 </html>
