@@ -17,11 +17,11 @@
         .terminal-output::-webkit-scrollbar, .gui-list::-webkit-scrollbar { width: 6px; }
         .terminal-output::-webkit-scrollbar-thumb, .gui-list::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
         .window-base { transition: width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease; }
-        .is-dragging { transition: none !important; }
+        .is-dragging, .is-resizing { transition: none !important; }
         
         .maximized { top: 0 !important; left: 0 !important; width: 100% !important; height: calc(100% - 4rem) !important; transform: none !important; border-radius: 0 !important; }
         .iframe-shield { display: none; position: absolute; inset: 0; z-index: 50; }
-        .is-dragging .iframe-shield { display: block; }
+        .is-dragging .iframe-shield, .is-resizing .iframe-shield { display: block; }
         
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
@@ -40,7 +40,6 @@
             .desktop-icon i { font-size: 2.2rem; margin-bottom: 4px; }
             .desktop-icon span { font-size: 0.65rem; }
             
-            /* Mobilon elrejtjük a teljes képernyő gombot, mert amúgy is fix */
             .btn-maximize { display: none; }
         }
     </style>
@@ -238,7 +237,7 @@
 
     </div>
 
-    <!-- TÁLCA (MOBILON GÖRDÍTHETŐ) -->
+    <!-- TÁLCA -->
     <div class="w-full h-16 bg-gray-950 border-t border-gray-800 flex items-center justify-start sm:justify-center px-4 space-x-2 sm:space-x-6 z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.5)] relative overflow-x-auto whitespace-nowrap scrollbar-hide">
         <button onclick="window.openWindow('window-drive')" class="text-gray-400 hover:text-blue-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
             <i class="fa-solid fa-cloud text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Drive</span>
@@ -265,6 +264,12 @@
         <button onclick="window.systemLogout()" class="text-gray-400 hover:text-red-500 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
             <i class="fa-solid fa-power-off text-xl sm:text-2xl mb-1"></i><span class="text-[9px] uppercase font-semibold">Logout</span>
         </button>
+
+        <!-- ÓRA ÉS DÁTUM A TÁLCÁN -->
+        <div class="absolute right-4 hidden sm:flex flex-col items-end text-gray-400 px-2 cursor-default">
+            <span id="taskbar-time" class="text-sm font-bold text-gray-200 tracking-wider">00:00</span>
+            <span id="taskbar-date" class="text-[10px] font-semibold">1970. 01. 01.</span>
+        </div>
     </div>
 
     <!-- FIREBASE MODUL LOGIKA -->
@@ -294,6 +299,15 @@
             globalTenants: []
         };
         let zIndexCounter = 10;
+
+        // Óra frissítése másodpercenként
+        function updateTaskbarClock() {
+            const now = new Date();
+            document.getElementById('taskbar-time').innerText = now.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('taskbar-date').innerText = now.toLocaleDateString('hu-HU', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        }
+        setInterval(updateTaskbarClock, 1000);
+        updateTaskbarClock();
 
         window.performLogin = async function () {
             const ws = document.getElementById('login-workspace').value.trim().toLowerCase();
@@ -366,6 +380,9 @@
         }
 
         window.systemLogout = function () {
+            // MEGERŐSÍTÉS HOZZÁADVA
+            if (!confirm("Biztosan ki szeretnél jelentkezni?")) return;
+
             appState = { currentWorkspaceId: null, currentUser: null, isSuperAdmin: false, workspaceUsers: [], globalTenants: [] };
             document.querySelectorAll('.draggable').forEach(w => window.closeWindow(w.id));
             
@@ -500,7 +517,7 @@
             window.guiRenderDomains();
         };
 
-        // Ablakkezelés (csak desktopon van értelme mozgatni, mobilon ki van kapcsolva CSS-ből)
+        // Ablakkezelés 
         window.toggleMaximize = function (id) { const win = document.getElementById(id); win.classList.toggle('maximized'); window.bringToFront(win); };
         window.openWindow = function (id) { 
             const win = document.getElementById(id); 
@@ -513,23 +530,50 @@
 
         document.querySelectorAll('.draggable').forEach(el => { el.addEventListener('mousedown', () => window.bringToFront(el)); el.addEventListener('touchstart', () => window.bringToFront(el), {passive: true}); });
 
-        interact('.draggable').draggable({
-            allowFrom: '.window-header',
-            listeners: {
-                start(event) { event.target.classList.add('is-dragging'); },
-                move(event) {
-                    var target = event.target;
-                    // Ha teljes képernyős (mobilon vagy manuálisan) ne lehessen húzni
-                    if (target.classList.contains('maximized') || window.innerWidth <= 768) return;
-                    var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                    var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-                    target.style.transform = `translate(${x}px, ${y}px)`;
-                    target.setAttribute('data-x', x); target.setAttribute('data-y', y);
+        // ABLAKOK HÚZÁSA ÉS ÚJ: ÁTMÉRETEZÉSE (RESIZABLE)
+        interact('.draggable')
+            .draggable({
+                allowFrom: '.window-header',
+                listeners: {
+                    start(event) { event.target.classList.add('is-dragging'); },
+                    move(event) {
+                        var target = event.target;
+                        if (target.classList.contains('maximized') || window.innerWidth <= 768) return;
+                        var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                        var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                        target.style.transform = `translate(${x}px, ${y}px)`;
+                        target.setAttribute('data-x', x); target.setAttribute('data-y', y);
+                    },
+                    end(event) { event.target.classList.remove('is-dragging'); }
                 },
-                end(event) { event.target.classList.remove('is-dragging'); }
-            },
-            modifiers: [interact.modifiers.restrictRect({ restriction: '#desktop', endOnly: false })]
-        });
+                modifiers: [interact.modifiers.restrictRect({ restriction: '#desktop', endOnly: false })]
+            })
+            .resizable({
+                edges: { left: true, right: true, bottom: true, top: true },
+                listeners: {
+                    start(event) { event.target.classList.add('is-resizing'); },
+                    move(event) {
+                        var target = event.target;
+                        if (target.classList.contains('maximized') || window.innerWidth <= 768) return;
+                        
+                        var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.deltaRect.left;
+                        var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.deltaRect.top;
+
+                        Object.assign(target.style, {
+                            width: `${event.rect.width}px`,
+                            height: `${event.rect.height}px`,
+                            transform: `translate(${x}px, ${y}px)`
+                        });
+
+                        Object.assign(target.dataset, { x, y });
+                    },
+                    end(event) { event.target.classList.remove('is-resizing'); }
+                },
+                modifiers: [
+                    interact.modifiers.restrictSize({ min: { width: 400, height: 300 } }),
+                    interact.modifiers.restrictEdges({ outer: '#desktop' })
+                ]
+            });
 
         const termOutput = document.getElementById('term-output');
         const termInput = document.getElementById('term-input');
