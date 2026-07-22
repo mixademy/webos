@@ -175,12 +175,18 @@
                     class="fa-solid fa-globe text-yellow-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
                 <span class="text-white text-xs text-center font-medium drop-shadow-md">Web</span>
             </div>
-            <!-- ÚJ: ORION AI -->
             <div onclick="window.openWindow('window-orion')"
                 class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
                 <i
                     class="fa-solid fa-robot text-cyan-400 text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
                 <span class="text-white text-xs text-center font-medium drop-shadow-md">Orion AI</span>
+            </div>
+            <!-- ÚJ: IDŐZÍTŐ -->
+            <div onclick="window.openWindow('window-timer')"
+                class="desktop-icon flex flex-col items-center w-20 sm:w-24 p-2 cursor-pointer group">
+                <i
+                    class="fa-solid fa-stopwatch text-white text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform drop-shadow-lg"></i>
+                <span class="text-white text-xs text-center font-medium drop-shadow-md">Időzítő</span>
             </div>
 
             <div onclick="window.openWindow('window-terminal')"
@@ -273,7 +279,7 @@
             </div>
         </div>
 
-        <!-- ÚJ: ORION AI ABLAK -->
+        <!-- ORION AI ABLAK -->
         <div id="window-orion"
             class="draggable window-base absolute top-28 left-20 md:left-56 w-full md:w-[900px] h-full md:h-[650px] bg-gray-900 border border-cyan-700 rounded-lg shadow-2xl hidden flex-col"
             style="z-index: 10;">
@@ -292,6 +298,57 @@
             <div class="flex-grow bg-white md:rounded-b-lg overflow-hidden relative">
                 <div class="iframe-shield bg-transparent"></div>
                 <iframe id="iframe-orion" src="" class="w-full h-full border-none"></iframe>
+            </div>
+        </div>
+
+        <!-- ÚJ: IDŐZÍTŐ ABLAK -->
+        <div id="window-timer"
+            class="draggable window-base absolute top-10 md:top-32 left-10 md:left-64 w-full md:w-[700px] h-full md:h-[500px] bg-black border border-gray-600 rounded-lg shadow-2xl hidden flex-col"
+            style="z-index: 10;">
+            <div
+                class="window-header bg-gray-800 p-3 flex justify-between items-center md:rounded-t-lg text-white font-bold text-sm border-b border-gray-700">
+                <span><i class="fa-solid fa-stopwatch mr-2 text-white"></i>Időzítő</span>
+                <div>
+                    <button onclick="window.toggleMaximize('window-timer')"
+                        class="btn-maximize text-gray-400 hover:text-white transition px-2"><i
+                            class="fa-solid fa-expand"></i></button>
+                    <button onclick="window.closeWindow('window-timer')"
+                        class="text-gray-400 hover:text-red-500 transition px-2"><i
+                            class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+            </div>
+            <div
+                class="flex-grow bg-black md:rounded-b-lg overflow-hidden relative flex flex-col items-center justify-center p-4 text-white">
+                <div class="iframe-shield bg-transparent"></div>
+                <!-- Pontos idő felül középen, kisebb méretben -->
+                <div class="absolute top-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                    <span class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Pontos idő</span>
+                    <div id="app-exact-time" class="text-2xl md:text-3xl font-mono font-bold opacity-90">00:00:00.0
+                    </div>
+                </div>
+
+                <!-- Visszaszámláló teljesen középen, nagy méretben -->
+                <div id="app-countdown"
+                    class="text-7xl md:text-9xl font-mono font-bold tracking-tighter mt-12 mb-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                    00:00</div>
+
+                <!-- Gombok a visszaszámláló beállításához -->
+                <div class="flex gap-3 sm:gap-4 flex-wrap justify-center mt-4">
+                    <button onclick="window.startCountdown(30)"
+                        class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 px-4 sm:px-6 py-2 sm:py-3 rounded font-bold transition text-sm sm:text-base shadow hover:shadow-gray-700/50">30
+                        perc</button>
+                    <button onclick="window.startCountdown(60)"
+                        class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 px-4 sm:px-6 py-2 sm:py-3 rounded font-bold transition text-sm sm:text-base shadow hover:shadow-gray-700/50">1
+                        óra</button>
+                    <button onclick="window.startCountdown(90)"
+                        class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 px-4 sm:px-6 py-2 sm:py-3 rounded font-bold transition text-sm sm:text-base shadow hover:shadow-gray-700/50">1.5
+                        óra</button>
+                    <button onclick="window.startCountdown(120)"
+                        class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 px-4 sm:px-6 py-2 sm:py-3 rounded font-bold transition text-sm sm:text-base shadow hover:shadow-gray-700/50">2
+                        óra</button>
+                    <button onclick="window.stopCountdown()"
+                        class="bg-red-900 hover:bg-red-800 text-red-200 border border-red-700 px-4 sm:px-6 py-2 sm:py-3 rounded font-bold transition text-sm sm:text-base ml-0 sm:ml-4 shadow hover:shadow-red-900/50">Törlés</button>
+                </div>
             </div>
         </div>
 
@@ -440,11 +497,16 @@
             <i class="fa-solid fa-globe text-xl sm:text-2xl mb-1"></i><span
                 class="text-[9px] uppercase font-semibold">Web</span>
         </button>
-        <!-- ÚJ: ORION AI IKON -->
         <button onclick="window.openWindow('window-orion')"
             class="text-gray-400 hover:text-cyan-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
             <i class="fa-solid fa-robot text-xl sm:text-2xl mb-1"></i><span
                 class="text-[9px] uppercase font-semibold">Orion</span>
+        </button>
+        <!-- ÚJ: IDŐZÍTŐ IKON A TÁLCÁN -->
+        <button onclick="window.openWindow('window-timer')"
+            class="text-gray-400 hover:text-white flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
+            <i class="fa-solid fa-stopwatch text-xl sm:text-2xl mb-1"></i><span
+                class="text-[9px] uppercase font-semibold">Időzítő</span>
         </button>
         <button onclick="window.openWindow('window-terminal')"
             class="text-gray-400 hover:text-green-400 flex flex-col items-center transition transform hover:-translate-y-1 w-14 sm:w-16 flex-shrink-0">
@@ -506,7 +568,7 @@
         };
         let zIndexCounter = 10;
 
-        // Óra frissítése másodpercenként
+        // --- ÓRA FRISSÍTÉSE ---
         function updateTaskbarClock() {
             const now = new Date();
             document.getElementById('taskbar-time').innerText = now.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
@@ -515,6 +577,53 @@
         setInterval(updateTaskbarClock, 1000);
         updateTaskbarClock();
 
+        // --- IDŐZÍTŐ ALKALMAZÁS LOGIKA ---
+        setInterval(() => {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            const ms = Math.floor(now.getMilliseconds() / 100);
+            const exactTimeDisplay = document.getElementById('app-exact-time');
+            if (exactTimeDisplay) exactTimeDisplay.innerText = `${h}:${m}:${s}.${ms}`;
+        }, 50);
+
+        let countdownInterval = null;
+        let countdownEndTime = 0;
+
+        window.startCountdown = function (minutes) {
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownEndTime = Date.now() + (minutes * 60 * 1000);
+            updateCountdownDisplay();
+            countdownInterval = setInterval(updateCountdownDisplay, 250);
+        };
+
+        window.stopCountdown = function () {
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownInterval = null;
+            document.getElementById('app-countdown').innerText = "00:00";
+        };
+
+        function updateCountdownDisplay() {
+            const diff = countdownEndTime - Date.now();
+            if (diff <= 0) {
+                window.stopCountdown();
+                return;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            let displayStr = "";
+            if (hours > 0) displayStr += String(hours).padStart(2, '0') + ":";
+            displayStr += String(mins).padStart(2, '0') + ":" + String(secs).padStart(2, '0');
+
+            document.getElementById('app-countdown').innerText = displayStr;
+        }
+
+
+        // --- BEJELENTKEZÉS ÉS RENDSZER LOGIKA ---
         window.performLogin = async function () {
             const ws = document.getElementById('login-workspace').value.trim().toLowerCase();
             const u = document.getElementById('login-username').value.trim();
@@ -573,7 +682,7 @@
             document.getElementById('iframe-drive').src = `https://drive.mixademy.hu/?session_token=${tokenStr}`;
             document.getElementById('iframe-event').src = `https://event.mixademy.hu/?session_token=${tokenStr}`;
             document.getElementById('iframe-web').src = `https://mixademy.hu/?session_token=${tokenStr}`;
-            document.getElementById('iframe-orion').src = `https://orionai.mixademy.hu/?session_token=${tokenStr}`; // ORION AI
+            document.getElementById('iframe-orion').src = `https://orionai.mixademy.hu/?session_token=${tokenStr}`;
 
             if (appState.isSuperAdmin) {
                 document.getElementById('gui-users-ws-title').innerText = appState.currentWorkspaceId.toUpperCase();
@@ -595,7 +704,7 @@
             document.getElementById('iframe-drive').src = '';
             document.getElementById('iframe-event').src = '';
             document.getElementById('iframe-web').src = '';
-            document.getElementById('iframe-orion').src = ''; // ORION AI
+            document.getElementById('iframe-orion').src = '';
 
             document.querySelectorAll('.master-ui, .super-ui').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
 
